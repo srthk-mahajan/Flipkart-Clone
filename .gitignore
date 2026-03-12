@@ -16,6 +16,9 @@ yarn-error.log*
 frontend/dist/
 backend/dist/
 
+# local DB migration artifacts
+backend/migration/
+
 # OS/editor
 .DS_Store
 Thumbs.db
