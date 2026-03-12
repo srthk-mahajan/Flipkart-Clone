@@ -10,12 +10,6 @@ export const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
 
-pool.on('connect', (client) => {
-  client.query('SET search_path TO public').catch((error) => {
-    console.error('Failed to set search_path on DB connection:', error.message);
-  });
-});
-
 export const initDatabase = async () => {
   const client = await pool.connect();
   try {

@@ -6,9 +6,32 @@ dotenv.config();
 
 let dbInitialized = false;
 let dbInitPromise = null;
+const DB_INIT_TIMEOUT_MS = Number(process.env.DB_INIT_TIMEOUT_MS || 8000);
+const SHOULD_BOOTSTRAP_SCHEMA_ON_COLD_START =
+  process.env.DB_BOOTSTRAP_ON_COLD_START === 'true' || process.env.NODE_ENV !== 'production';
+
+const withTimeout = async (promise, timeoutMs, errorMessage) => {
+  let timeoutId;
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+      })
+    ]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
 
 const ensureDatabaseReady = async () => {
   if (dbInitialized) return;
+
+  if (!SHOULD_BOOTSTRAP_SCHEMA_ON_COLD_START) {
+    dbInitialized = true;
+    return;
+  }
 
   if (!dbInitPromise) {
     dbInitPromise = (async () => {
@@ -40,7 +63,22 @@ const ensureDatabaseReady = async () => {
 };
 
 export default async function handler(req, res) {
-  await ensureDatabaseReady();
+  if (!req.url?.startsWith('/api')) {
+    return res.status(404).json({
+      success: false,
+      message: 'Not Found'
+    });
+  }
+
+  try {
+    await withTimeout(ensureDatabaseReady(), DB_INIT_TIMEOUT_MS, 'Database initialization timed out');
+  } catch (error) {
+    console.error('Database initialization failed:', error.message);
+    return res.status(503).json({
+      success: false,
+      message: 'Service temporarily unavailable. Please try again shortly.'
+    });
+  }
 
   return app(req, res);
 }
