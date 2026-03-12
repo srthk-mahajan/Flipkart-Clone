@@ -4,6 +4,12 @@ import { getProducts } from '../services/api.js';
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 
+const optimizeImageUrl = (url) => {
+  if (!url || !url.includes('images.unsplash.com')) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}auto=format&fit=crop&q=70`;
+};
+
 function Home() {
   const navigate = useNavigate();
   const [allProducts, setAllProducts] = useState([]);
@@ -217,7 +223,7 @@ function Home() {
                 <p>{product.subtitle}</p>
                 <button>Know more</button>
               </div>
-              <img src={product.image_url} alt={product.title} />
+              <img src={optimizeImageUrl(product.image_url)} alt={product.title} loading="lazy" decoding="async" />
             </article>
           ))}
         </div>
@@ -248,7 +254,7 @@ function Home() {
               onClick={() => goToListing(item.category, item.search)}
             >
               <div className="subcat-icon">
-                <img src={item.image} alt={item.label} />
+                <img src={optimizeImageUrl(item.image)} alt={item.label} loading="lazy" decoding="async" />
               </div>
               <span>{item.label}</span>
             </button>
@@ -264,7 +270,7 @@ function Home() {
                 className="deal-item clickable"
                 onClick={() => goToListing(item.category, item.name)}
               >
-                <img src={item.image_url} alt={item.name} />
+                <img src={optimizeImageUrl(item.image_url)} alt={item.name} loading="lazy" decoding="async" />
                 <p>{item.name}</p>
                 <strong>From ₹{Number(item.price).toLocaleString('en-IN')}</strong>
               </article>
@@ -281,7 +287,7 @@ function Home() {
                 className="deal-item clickable"
                 onClick={() => goToListing(item.category, item.name)}
               >
-                <img src={item.image_url} alt={item.name} />
+                <img src={optimizeImageUrl(item.image_url)} alt={item.name} loading="lazy" decoding="async" />
                 <p>{item.name}</p>
                 <strong>Min 40% Off</strong>
               </article>
@@ -306,7 +312,7 @@ function Home() {
                   onClick={() => navigate(`/product/${item.id}`)}
                 >
                   <Link to={`/product/${item.id}`}>
-                    <img src={item.image_url} alt={item.name} />
+                    <img src={optimizeImageUrl(item.image_url)} alt={item.name} loading="lazy" decoding="async" />
                   </Link>
                   <p>{item.name}</p>
                   <strong>₹{Number(item.price).toLocaleString('en-IN')}</strong>

@@ -31,7 +31,11 @@ export const CartProvider = ({ children }) => {
       await addToCart({ productId, quantity });
       const items = await refreshCart();
       if (items) {
-        const added = items.find(item => item.product_id === productId);
+        const normalizedProductId = Number(productId);
+        const added =
+          items.find((item) => Number(item.product_id) === normalizedProductId) ||
+          items[items.length - 1] ||
+          null;
         setRecentlyAddedItem(added);
       }
     },

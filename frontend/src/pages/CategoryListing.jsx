@@ -187,18 +187,28 @@ function CategoryListing() {
   const inStockOnly = searchParams.get('inStock') === '1';
 
   useEffect(() => {
+    const fetchAllProducts = async () => {
+      try {
+        const full = await getProducts();
+        setAllProducts(full?.data || []);
+      } catch {
+        setAllProducts([]);
+      }
+    };
+
+    fetchAllProducts();
+  }, []);
+
+  useEffect(() => {
     setSelectedFilters({});
     const fetchData = async () => {
       setLoading(true);
       setFallbackApplied(false);
       try {
-        const [filtered, full] = await Promise.all([
-          getProducts({
-            ...(selectedCategory !== 'all' ? { category: selectedCategory } : {}),
-            ...(search ? { search } : {})
-          }),
-          getProducts()
-        ]);
+        const filtered = await getProducts({
+          ...(selectedCategory !== 'all' ? { category: selectedCategory } : {}),
+          ...(search ? { search } : {})
+        });
 
         let resultData = filtered?.data || [];
 
@@ -213,7 +223,6 @@ function CategoryListing() {
         }
 
         setProducts(resultData);
-        setAllProducts(full?.data || []);
       } finally {
         setLoading(false);
       }
