@@ -1,35 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import ProductGrid from '../components/ProductGrid.jsx';
+import { Link, useNavigate } from 'react-router-dom';
 import { getProducts } from '../services/api.js';
 import { useCart } from '../context/CartContext.jsx';
-
-const sidebarCategories = ['all', 'electronics', 'fashion', 'home', 'appliances', 'books'];
+import { useWishlist } from '../context/WishlistContext.jsx';
 
 function Home() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [allProducts, setAllProducts] = useState([]);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [heroStartIndex, setHeroStartIndex] = useState(0);
   const { addItem } = useCart();
-
-  const category = useMemo(() => searchParams.get('category') || 'all', [searchParams]);
-  const search = useMemo(() => searchParams.get('search') || '', [searchParams]);
+  const { wishlistIds } = useWishlist();
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const params = {};
-        if (category !== 'all') params.category = category;
-        if (search) params.search = search;
-
-        const [filteredResponse, allResponse] = await Promise.all([
-          getProducts(params),
-          getProducts()
-        ]);
-
-        setProducts(filteredResponse.data || []);
+        const allResponse = await getProducts();
         setAllProducts(allResponse.data || []);
       } finally {
         setLoading(false);
@@ -37,169 +24,280 @@ function Home() {
     };
 
     fetchProducts();
-  }, [category, search]);
+  }, []);
 
-  const onSidebarCategory = (selectedCategory) => {
-    const params = new URLSearchParams(searchParams);
-    if (selectedCategory === 'all') {
-      params.delete('category');
-    } else {
-      params.set('category', selectedCategory);
+  const goToListing = (category, search = '') => {
+    const params = new URLSearchParams({ sort: 'popularity' });
+    if (search.trim()) {
+      params.set('search', search.trim());
     }
-    setSearchParams(params);
+    navigate(`/category/${category}?${params.toString()}`);
   };
 
-  const hasActiveFilter = category !== 'all' || Boolean(search);
-  const displayProducts = useMemo(() => {
-    if (products.length > 0) return products;
-    if (hasActiveFilter) return allProducts;
-    return allProducts;
-  }, [products, hasActiveFilter, allProducts]);
-
   const topHeroCards = useMemo(() => {
-    const defaults = [
+    return [
       {
         id: 'hero-1',
         title: 'Tech at lowest prices',
         subtitle: 'Up to 50% Off',
-        image_url: allProducts[0]?.image_url || 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?w=900'
+        category: 'electronics',
+        search: 'phone',
+        image_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200'
       },
       {
         id: 'hero-2',
         title: 'Acer Swift Neo OLED AI',
         subtitle: 'Starts ₹50,490*',
-        image_url: allProducts[3]?.image_url || 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900'
+        category: 'electronics',
+        search: 'laptop',
+        image_url: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200'
       },
       {
         id: 'hero-3',
         title: 'OnePlus Nord Buds',
         subtitle: 'Launch offers live',
-        image_url: allProducts[2]?.image_url || 'https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=900'
+        category: 'electronics',
+        search: 'earbuds',
+        image_url: 'https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=1200'
+      },
+      {
+        id: 'hero-4',
+        title: 'Style update sale',
+        subtitle: 'From ₹499 only',
+        category: 'fashion',
+        search: 'shirt',
+        image_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200'
+      },
+      {
+        id: 'hero-5',
+        title: 'Smart home picks',
+        subtitle: 'Up to 40% Off',
+        category: 'home',
+        search: 'chair',
+        image_url: 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=1200'
+      },
+      {
+        id: 'hero-6',
+        title: 'Book fair specials',
+        subtitle: 'Bestsellers under ₹599',
+        category: 'books',
+        search: 'book',
+        image_url: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=1200'
       }
     ];
+  }, []);
 
-    return defaults;
-  }, [allProducts]);
+  useEffect(() => {
+    if (topHeroCards.length <= 1) return undefined;
+
+    const interval = setInterval(() => {
+      setHeroStartIndex((prev) => (prev + 1) % topHeroCards.length);
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [topHeroCards.length]);
+
+  const visibleHeroCards = useMemo(() => {
+    const visibleCount = Math.min(3, topHeroCards.length);
+    return Array.from({ length: visibleCount }, (_, offset) => {
+      const index = (heroStartIndex + offset) % topHeroCards.length;
+      return topHeroCards[index];
+    });
+  }, [topHeroCards, heroStartIndex]);
+
   const interestingFinds = useMemo(() => allProducts.slice(3, 7), [allProducts]);
   const grabOrGone = useMemo(() => allProducts.slice(7, 11), [allProducts]);
+  const wishlistPreview = useMemo(
+    () => allProducts.filter((item) => wishlistIds.includes(Number(item.id))).slice(0, 4),
+    [allProducts, wishlistIds]
+  );
 
   const electronicsQuickItems = useMemo(() => {
-    const labels = [
-      'New Launches',
-      'Headsets',
-      'Wearables',
-      'Grooming',
-      'Cases & Covers',
-      'Camera',
-      'Power Bank',
-      'Gaming',
-      'Smart devices',
-      'Networking',
-      'Laptops',
-      'Tablets',
-      'IT Peripherals',
-      '2 Wheeler',
-      'Accessories',
-      'Mobile Chargers',
-      'Storage',
-      'Healthcare',
-      'Gaming Hub'
+    return [
+      {
+        label: 'New Launches',
+        category: 'electronics',
+        search: 'phone',
+        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300'
+      },
+      {
+        label: 'Headsets',
+        category: 'electronics',
+        search: 'earbuds',
+        image: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300'
+      },
+      {
+        label: 'Wearables',
+        category: 'electronics',
+        search: 'watch',
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'
+      },
+      {
+        label: 'Grooming',
+        category: 'fashion',
+        search: 'shirt',
+        image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=300'
+      },
+      {
+        label: 'Cases & Covers',
+        category: 'electronics',
+        search: 'mobile',
+        image: 'https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=300'
+      },
+      {
+        label: 'Camera',
+        category: 'electronics',
+        search: 'camera',
+        image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300'
+      },
+      {
+        label: 'Power Bank',
+        category: 'electronics',
+        search: 'power bank',
+        image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=300'
+      },
+      {
+        label: 'Gaming',
+        category: 'electronics',
+        search: 'keyboard',
+        image: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=300'
+      },
+      {
+        label: 'Smart devices',
+        category: 'electronics',
+        search: 'smart watch',
+        image: 'https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=300'
+      },
+      {
+        label: 'Networking',
+        category: 'electronics',
+        search: 'wireless',
+        image: 'https://images.unsplash.com/photo-1544191696-102dbdaeeaa0?w=300'
+      }
     ];
+  }, []);
 
-    return labels.map((label, index) => ({
-      label,
-      image: allProducts[index % Math.max(allProducts.length, 1)]?.image_url || 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?w=200'
-    }));
-  }, [allProducts]);
+  if (loading) {
+    return <div className="panel">Loading homepage deals...</div>;
+  }
 
   return (
     <div className="home-page">
-      {!hasActiveFilter ? (
-        <>
-          <div className="promo-strip">
-            {topHeroCards.map((product) => (
-              <article key={product.id} className="promo-card">
-                <div className="promo-overlay">
-                  <span className="promo-badge">BIG SAVING DAYS</span>
-                  <h3>{product.title}</h3>
-                  <p>{product.subtitle}</p>
-                  <button>Know more</button>
-                </div>
-                <img src={product.image_url} alt={product.title} />
+      <>
+        <div className="promo-strip">
+          {visibleHeroCards.map((product) => (
+            <article
+              key={product.id}
+              className="promo-card clickable"
+              onClick={() => goToListing(product.category, product.search)}
+            >
+              <div className="promo-overlay">
+                <span className="promo-badge">BIG SAVING DAYS</span>
+                <h3>{product.title}</h3>
+                <p>{product.subtitle}</p>
+                <button>Know more</button>
+              </div>
+              <img src={product.image_url} alt={product.title} />
+            </article>
+          ))}
+        </div>
+        <div className="hero-dots">
+          {topHeroCards.map((card, idx) => (
+            <button
+              key={card.id}
+              type="button"
+              className={idx === heroStartIndex ? 'active' : ''}
+              onClick={() => setHeroStartIndex(idx)}
+              aria-label={`Show slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        <section className="subcat-strip">
+          {electronicsQuickItems.map((item) => (
+            <button
+              className="subcat-item"
+              key={item.label}
+              onClick={() => goToListing(item.category, item.search)}
+            >
+              <div className="subcat-icon">
+                <img src={item.image} alt={item.label} />
+              </div>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </section>
+
+        <section className="deal-section">
+          <h2>Interesting finds</h2>
+          <div className="deal-grid">
+            {interestingFinds.map((item) => (
+              <article
+                key={item.id}
+                className="deal-item clickable"
+                onClick={() => goToListing(item.category, item.name)}
+              >
+                <img src={item.image_url} alt={item.name} />
+                <p>{item.name}</p>
+                <strong>From ₹{Number(item.price).toLocaleString('en-IN')}</strong>
               </article>
             ))}
           </div>
-          <div className="hero-dots" aria-hidden>
-            <span />
-            <span />
-            <span className="active" />
-            <span />
-            <span />
-          </div>
+        </section>
 
-          <section className="subcat-strip">
-            {electronicsQuickItems.map((item) => (
-              <div className="subcat-item" key={item.label}>
-                <div className="subcat-icon">
-                  <img src={item.image} alt={item.label} />
-                </div>
-                <span>{item.label}</span>
-              </div>
+        <section className="deal-section">
+          <h2>Grab or gone</h2>
+          <div className="deal-grid">
+            {grabOrGone.map((item) => (
+              <article
+                key={item.id}
+                className="deal-item clickable"
+                onClick={() => goToListing(item.category, item.name)}
+              >
+                <img src={item.image_url} alt={item.name} />
+                <p>{item.name}</p>
+                <strong>Min 40% Off</strong>
+              </article>
             ))}
-          </section>
-
-          <section className="deal-section">
-            <h2>Interesting finds</h2>
-            <div className="deal-grid">
-              {interestingFinds.map((item) => (
-                <article key={item.id} className="deal-item">
-                  <img src={item.image_url} alt={item.name} />
-                  <p>{item.name}</p>
-                  <strong>From ₹{Number(item.price).toLocaleString('en-IN')}</strong>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="deal-section">
-            <h2>Grab or gone</h2>
-            <div className="deal-grid">
-              {grabOrGone.map((item) => (
-                <article key={item.id} className="deal-item">
-                  <img src={item.image_url} alt={item.name} />
-                  <p>{item.name}</p>
-                  <strong>Min 40% Off</strong>
-                </article>
-              ))}
-            </div>
-          </section>
-        </>
-      ) : (
-        <section className="home-layout">
-          <aside className="sidebar">
-            <h3>Filters</h3>
-            <p className="muted">Category</p>
-            <div className="category-list">
-              {sidebarCategories.map((cat) => (
-                <button key={cat} className={cat === category ? 'active' : ''} onClick={() => onSidebarCategory(cat)}>
-                  {cat === 'all' ? 'All Categories' : cat}
-                </button>
-              ))}
-            </div>
-          </aside>
-
-          <div className="listing-section">
-            <div className="section-header">
-              <h2>{category === 'all' ? 'Interesting finds' : `${category} picks`}</h2>
-              {search ? <span>Search: “{search}”</span> : null}
-            </div>
-            {hasActiveFilter && !products.length && !loading ? (
-              <p className="listing-shell-note">No exact match found, showing popular products instead.</p>
-            ) : null}
-            <ProductGrid products={displayProducts} loading={loading} onAddToCart={addItem} />
           </div>
         </section>
-      )}
+
+        <section className="wishlist-home-section panel">
+          <div className="wishlist-home-head">
+            <h2>Wishlist segment</h2>
+            <Link to="/wishlist">Open wishlist</Link>
+          </div>
+
+          {!wishlistPreview.length ? (
+            <p className="muted">No wishlist items yet. Tap the heart icon on listing pages to save products.</p>
+          ) : (
+            <div className="wishlist-preview-grid">
+              {wishlistPreview.map((item) => (
+                <article
+                  key={item.id}
+                  className="wishlist-preview-card clickable"
+                  onClick={() => navigate(`/product/${item.id}`)}
+                >
+                  <Link to={`/product/${item.id}`}>
+                    <img src={item.image_url} alt={item.name} />
+                  </Link>
+                  <p>{item.name}</p>
+                  <strong>₹{Number(item.price).toLocaleString('en-IN')}</strong>
+                  <button
+                    className="primary-btn"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      addItem(item.id);
+                    }}
+                  >
+                    Add to cart
+                  </button>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </>
     </div>
   );
 }

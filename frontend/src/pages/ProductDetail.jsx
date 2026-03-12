@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ImageCarousel from '../components/ImageCarousel.jsx';
+import { FiHeart } from 'react-icons/fi';
 import { getProductById } from '../services/api.js';
 import { useCart } from '../context/CartContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx';
 
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -76,6 +79,10 @@ function ProductDetail() {
         </div>
 
         <div className="detail-actions">
+          <button className="secondary-btn" onClick={() => toggleWishlist(product.id)}>
+            <FiHeart className={isWishlisted(product.id) ? 'filled' : ''} />
+            {isWishlisted(product.id) ? 'Wishlisted' : 'Add to wishlist'}
+          </button>
           <button className="primary-btn" onClick={() => addItem(product.id)} disabled={!product.stock}>
             Add to cart
           </button>

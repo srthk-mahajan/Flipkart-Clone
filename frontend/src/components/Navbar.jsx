@@ -1,29 +1,32 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { FiShoppingCart, FiSearch, FiMapPin, FiUser, FiChevronDown, FiX } from 'react-icons/fi';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { FiShoppingCart, FiSearch, FiMapPin, FiUser, FiChevronDown, FiX, FiHeart } from 'react-icons/fi';
 import { useCart } from '../context/CartContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx';
 import { loginUser, signupUser } from '../services/api.js';
 
 const categories = [
-  { key: 'all', label: 'For You', icon: '🛍️', backendCategory: 'all' },
-  { key: 'fashion', label: 'Fashion', icon: '👕', backendCategory: 'fashion' },
-  { key: 'mobiles', label: 'Mobiles', icon: '📱', backendCategory: 'electronics' },
-  { key: 'beauty', label: 'Beauty', icon: '💄', backendCategory: 'fashion' },
-  { key: 'electronics', label: 'Electronics', icon: '💻', backendCategory: 'electronics' },
-  { key: 'home', label: 'Home', icon: '🪑', backendCategory: 'home' },
-  { key: 'appliances', label: 'Appliances', icon: '📺', backendCategory: 'appliances' },
-  { key: 'toys', label: 'Toys, ba...', icon: '🧸', backendCategory: 'all' },
-  { key: 'food', label: 'Food & H...', icon: '🥫', backendCategory: 'home' },
-  { key: 'auto', label: 'Auto Acc...', icon: '🪖', backendCategory: 'all' },
-  { key: 'sports', label: 'Sports & ...', icon: '🏏', backendCategory: 'all' },
-  { key: 'books', label: 'Books & ...', icon: '📚', backendCategory: 'books' },
-  { key: 'furniture', label: 'Furniture', icon: '🛋️', backendCategory: 'home' }
+  { key: 'all', label: 'For You', icon: '🛍️', backendCategory: 'all', defaultSearch: '' },
+  { key: 'fashion', label: 'Fashion', icon: '👕', backendCategory: 'fashion', defaultSearch: '' },
+  { key: 'mobiles', label: 'Mobiles', icon: '📱', backendCategory: 'electronics', defaultSearch: 'phone' },
+  { key: 'beauty', label: 'Beauty', icon: '💄', backendCategory: 'fashion', defaultSearch: 'watch' },
+  { key: 'electronics', label: 'Electronics', icon: '💻', backendCategory: 'electronics', defaultSearch: '' },
+  { key: 'home', label: 'Home', icon: '🪑', backendCategory: 'home', defaultSearch: '' },
+  { key: 'appliances', label: 'Appliances', icon: '📺', backendCategory: 'appliances', defaultSearch: '' },
+  { key: 'toys', label: 'Toys, ba...', icon: '🧸', backendCategory: 'books', defaultSearch: '' },
+  { key: 'food', label: 'Food & H...', icon: '🥫', backendCategory: 'home', defaultSearch: 'kitchen' },
+  { key: 'auto', label: 'Auto Acc...', icon: '🪖', backendCategory: 'electronics', defaultSearch: 'charger' },
+  { key: 'sports', label: 'Sports & ...', icon: '🏏', backendCategory: 'fashion', defaultSearch: 'running' },
+  { key: 'books', label: 'Books & ...', icon: '📚', backendCategory: 'books', defaultSearch: '' },
+  { key: 'furniture', label: 'Furniture', icon: '🛋️', backendCategory: 'home', defaultSearch: 'chair' }
 ];
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { itemCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -40,34 +43,47 @@ function Navbar() {
     }
   });
 
-  const activeCategory = useMemo(() => searchParams.get('nav') || 'all', [searchParams]);
+  useEffect(() => {
+    setSearchValue(searchParams.get('search') || '');
+  }, [searchParams]);
+
+  const activeCategory = useMemo(() => {
+    if (location.pathname === '/') return 'all';
+    return searchParams.get('nav') || 'all';
+  }, [location.pathname, searchParams]);
+
+  const isHomeRoute = location.pathname === '/';
 
   const onSearchSubmit = (event) => {
     event.preventDefault();
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams();
 
     if (searchValue.trim()) {
       params.set('search', searchValue.trim());
-    } else {
-      params.delete('search');
     }
 
-    navigate(`/?${params.toString()}`);
+    params.set('sort', 'popularity');
+    params.set('nav', 'all');
+
+    navigate(`/category/all?${params.toString()}`);
   };
 
   const onCategoryClick = (categoryConfig) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams();
 
     params.set('nav', categoryConfig.key);
-    params.delete('search');
+    params.set('sort', 'popularity');
 
-    if (categoryConfig.backendCategory === 'all') {
-      params.delete('category');
-    } else {
-      params.set('category', categoryConfig.backendCategory);
+    if (categoryConfig.defaultSearch) {
+      params.set('search', categoryConfig.defaultSearch);
     }
 
-    navigate(`/?${params.toString()}`);
+    if (categoryConfig.backendCategory === 'all') {
+      navigate('/');
+      return;
+    }
+
+    navigate(`/category/${categoryConfig.backendCategory}?${params.toString()}`);
   };
 
   const onAuthInput = (event) => {
@@ -116,13 +132,15 @@ function Navbar() {
   };
 
   return (
-    <header className="navbar-wrapper">
-      <div className="service-strip">
-        <div className="service-chip active">🟨 Flipkart</div>
-        <div className="service-chip">⚡ Minutes</div>
-        <div className="service-chip">✈️ Travel</div>
-        <div className="service-chip">🛒 Grocery</div>
-      </div>
+    <header className={`navbar-wrapper ${isHomeRoute ? '' : 'flipkart-mode'}`}>
+      {isHomeRoute ? (
+        <div className="service-strip">
+          <div className="service-chip active">🟨 Flipkart</div>
+          <div className="service-chip">⚡ Minutes</div>
+          <div className="service-chip">✈️ Travel</div>
+          <div className="service-chip">🛒 Grocery</div>
+        </div>
+      ) : null}
 
       <div className="topbar">
         <Link className="brand" to="/">
@@ -170,6 +188,12 @@ function Navbar() {
             More
             <FiChevronDown size={14} />
           </button>
+
+          <Link className="cart-link" to="/wishlist">
+            <FiHeart />
+            Wishlist
+            {wishlistCount > 0 ? <span className="badge">{wishlistCount}</span> : null}
+          </Link>
 
           <Link className="cart-link" to="/cart">
             <FiShoppingCart />

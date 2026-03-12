@@ -310,6 +310,168 @@ const products = [
     category: 'books',
     stock: 170,
     image_url: 'https://images.unsplash.com/photo-1473755504818-b72b6dfdc226?w=900'
+  },
+
+  // additional catalog products
+  {
+    name: 'Lenovo IdeaPad Slim 3',
+    description: 'AMD Ryzen 5 laptop with 16GB RAM and 512GB SSD for productivity and study.',
+    price: 46990,
+    category: 'electronics',
+    stock: 42,
+    image_url: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=900'
+  },
+  {
+    name: 'Canon EOS Mirrorless Camera',
+    description: '24MP mirrorless camera with 4K recording and interchangeable lens support.',
+    price: 58999,
+    category: 'electronics',
+    stock: 21,
+    image_url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900'
+  },
+  {
+    name: 'Mi 20000mAh Power Bank',
+    description: 'Fast charging power bank with dual output and Type-C input support.',
+    price: 2199,
+    category: 'electronics',
+    stock: 180,
+    image_url: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=900'
+  },
+  {
+    name: 'JBL Bluetooth Speaker',
+    description: 'Portable speaker with deep bass, IPX7 rating, and 12-hour playback.',
+    price: 3999,
+    category: 'electronics',
+    stock: 74,
+    image_url: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?w=900'
+  },
+  {
+    name: 'Men Casual Polo T-Shirt',
+    description: 'Soft cotton-blend polo t-shirt for daily wear comfort.',
+    price: 699,
+    category: 'fashion',
+    stock: 160,
+    image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900'
+  },
+  {
+    name: 'Women Ethnic Dupatta Set',
+    description: 'Printed ethnic set with lightweight fabric and festive color tones.',
+    price: 1199,
+    category: 'fashion',
+    stock: 95,
+    image_url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=900'
+  },
+  {
+    name: 'Campus Sports Shoes',
+    description: 'Breathable sports shoes with anti-slip sole and soft cushioning.',
+    price: 1699,
+    category: 'fashion',
+    stock: 130,
+    image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900'
+  },
+  {
+    name: 'Leather Wallet for Men',
+    description: 'Compact genuine leather wallet with RFID protection.',
+    price: 899,
+    category: 'fashion',
+    stock: 220,
+    image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=900'
+  },
+  {
+    name: 'Ceramic Dinner Set 18 pcs',
+    description: 'Microwave-safe ceramic dinnerware set with elegant finish.',
+    price: 2699,
+    category: 'home',
+    stock: 58,
+    image_url: 'https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=900'
+  },
+  {
+    name: 'Indoor Snake Plant',
+    description: 'Low-maintenance indoor air-purifying plant in decorative pot.',
+    price: 499,
+    category: 'home',
+    stock: 145,
+    image_url: 'https://images.unsplash.com/photo-1463320726281-696a485928c7?w=900'
+  },
+  {
+    name: 'Kitchen Knife Set',
+    description: 'Stainless steel knife set with ergonomic handles and stand.',
+    price: 1299,
+    category: 'home',
+    stock: 88,
+    image_url: 'https://images.unsplash.com/photo-1593618998160-e34014e67546?w=900'
+  },
+  {
+    name: 'Study Table with Drawers',
+    description: 'Engineered wood study table with storage drawers and cable slot.',
+    price: 6499,
+    category: 'home',
+    stock: 33,
+    image_url: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=900'
+  },
+  {
+    name: 'Bajaj Electric Kettle 1.8L',
+    description: 'Fast-boil stainless steel kettle with auto shut-off feature.',
+    price: 1599,
+    category: 'appliances',
+    stock: 140,
+    image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=900'
+  },
+  {
+    name: 'Havells Room Heater',
+    description: 'Compact room heater with safety grill and overheat protection.',
+    price: 2899,
+    category: 'appliances',
+    stock: 67,
+    image_url: 'https://images.unsplash.com/photo-1616594039964-34f8627a4f11?w=900'
+  },
+  {
+    name: 'Samsung 55 inch Smart TV',
+    description: '4K UHD smart TV with HDR and voice assistant support.',
+    price: 52999,
+    category: 'appliances',
+    stock: 24,
+    image_url: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=900'
+  },
+  {
+    name: 'Eureka Forbes Vacuum Cleaner',
+    description: 'Powerful suction vacuum cleaner with reusable dust bag.',
+    price: 5999,
+    category: 'appliances',
+    stock: 54,
+    image_url: 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=900'
+  },
+  {
+    name: 'The Almanack of Naval Ravikant',
+    description: 'Wisdom on wealth, happiness, and decision-making.',
+    price: 449,
+    category: 'books',
+    stock: 185,
+    image_url: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900'
+  },
+  {
+    name: 'Rich Dad Poor Dad',
+    description: 'Personal finance classic focused on financial literacy.',
+    price: 399,
+    category: 'books',
+    stock: 240,
+    image_url: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=900'
+  },
+  {
+    name: 'Do Epic Shit',
+    description: 'Motivational and practical life advice for young professionals.',
+    price: 299,
+    category: 'books',
+    stock: 260,
+    image_url: 'https://images.unsplash.com/photo-1531901599143-df5010ab9438?w=900'
+  },
+  {
+    name: 'The Pragmatic Programmer',
+    description: 'Software craftsmanship and practical engineering habits.',
+    price: 899,
+    category: 'books',
+    stock: 120,
+    image_url: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=900'
   }
 ];
 

@@ -6,6 +6,8 @@ import Cart from './pages/Cart.jsx';
 import Checkout from './pages/Checkout.jsx';
 import OrderConfirmation from './pages/OrderConfirmation.jsx';
 import OrderHistory from './pages/OrderHistory.jsx';
+import CategoryListing from './pages/CategoryListing.jsx';
+import Wishlist from './pages/Wishlist.jsx';
 
 function App() {
   return (
@@ -14,7 +16,9 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/category/:categoryKey" element={<CategoryListing />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
