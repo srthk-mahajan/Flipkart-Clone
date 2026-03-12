@@ -26,10 +26,18 @@ app.use(
   })
 );
 
+import { pool } from './models/db.js';
+
 app.use(express.json());
 
-app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Backend is running' });
+app.get('/api/health', async (req, res) => {
+  try {
+    // Ping the database to keep Serverless Postgres awake
+    await pool.query('SELECT 1');
+    res.status(200).json({ success: true, message: 'Backend and Database are running' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Database connection failed' });
+  }
 });
 
 app.use('/api/products', productRoutes);

@@ -1608,3 +1608,132 @@ a {
     grid-column: span 2;
   }
 }
+
+/* --- CART BOTTOM BAR --- */
+.cart-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  padding: 12px 20px;
+  z-index: 1000;
+  transform: translateY(100%);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cart-bottom-bar.appear-from-bottom {
+  animation: slideUp 0.15s forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  to { transform: translateY(0); }
+}
+
+.cart-bottom-bar-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.cart-bottom-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.cart-bottom-bar-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.cart-bottom-bar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cart-bottom-bar-title {
+  color: #388e3c;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.cart-bottom-bar-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #212121;
+}
+
+.cart-bottom-bar-price {
+  font-weight: 700;
+  font-size: 16px;
+  color: #212121;
+}
+
+.cart-bottom-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.quantity-control select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-weight: 600;
+}
+
+.proceed-btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  border-radius: 4px;
+}
+
+.close-bottom-bar {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #878787;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-bottom-bar:hover {
+  color: #212121;
+}
+
+@media (max-width: 768px) {
+  .cart-bottom-bar-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cart-bottom-bar-actions {
+    justify-content: space-between;
+  }
+  .cart-bottom-bar-left {
+    margin-bottom: 8px;
+  }
+}

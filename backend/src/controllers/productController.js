@@ -28,6 +28,9 @@ export const getProducts = async (req, res, next) => {
 
     const { rows } = await pool.query(query, values);
 
+    // Edge Caching: Cache products for 60 seconds on Vercel Edge
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
+
     res.status(200).json({
       success: true,
       count: rows.length,
@@ -57,6 +60,9 @@ export const getProductById = async (req, res, next) => {
         message: 'Product not found'
       });
     }
+
+    // Edge Caching
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
 
     res.status(200).json({
       success: true,

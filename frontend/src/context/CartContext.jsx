@@ -7,13 +7,16 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [summary, setSummary] = useState({ subtotal: 0, total: 0 });
   const [loading, setLoading] = useState(false);
+  const [recentlyAddedItem, setRecentlyAddedItem] = useState(null);
 
   const refreshCart = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getCart();
-      setCartItems(response.data || []);
+      const items = response.data || [];
+      setCartItems(items);
       setSummary(response.summary || { subtotal: 0, total: 0 });
+      return items;
     } finally {
       setLoading(false);
     }
@@ -26,7 +29,11 @@ export const CartProvider = ({ children }) => {
   const addItem = useCallback(
     async (productId, quantity = 1) => {
       await addToCart({ productId, quantity });
-      await refreshCart();
+      const items = await refreshCart();
+      if (items) {
+        const added = items.find(item => item.product_id === productId);
+        setRecentlyAddedItem(added);
+      }
     },
     [refreshCart]
   );
@@ -49,11 +56,15 @@ export const CartProvider = ({ children }) => {
 
   const itemCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
 
+  const clearRecentlyAddedItem = useCallback(() => setRecentlyAddedItem(null), []);
+
   const value = {
     cartItems,
     summary,
     loading,
     itemCount,
+    recentlyAddedItem,
+    clearRecentlyAddedItem,
     addItem,
     removeItem,
     updateItemQuantity,

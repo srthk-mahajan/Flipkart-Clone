@@ -8,6 +8,7 @@ import OrderConfirmation from './pages/OrderConfirmation.jsx';
 import OrderHistory from './pages/OrderHistory.jsx';
 import CategoryListing from './pages/CategoryListing.jsx';
 import Wishlist from './pages/Wishlist.jsx';
+import CartBottomBar from './components/CartBottomBar.jsx';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/orders" element={<OrderHistory />} />
         </Routes>
+        <CartBottomBar />
       </main>
     </div>
   );
