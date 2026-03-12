@@ -1,10 +1,13 @@
 import { pool } from '../models/db.js';
-
-const getEffectiveUserId = (req) => Number(req.body.userId || req.query.userId || process.env.DEFAULT_USER_ID || 1);
+import { resolveEffectiveUserId } from '../utils/identity.js';
 
 export const getCartItems = async (req, res, next) => {
   try {
-    const userId = getEffectiveUserId(req);
+    const userId = await resolveEffectiveUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId or guestId is required' });
+    }
 
     const { rows } = await pool.query(
       `
@@ -44,7 +47,12 @@ export const getCartItems = async (req, res, next) => {
 
 export const addToCart = async (req, res, next) => {
   try {
-    const userId = getEffectiveUserId(req);
+    const userId = await resolveEffectiveUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId or guestId is required' });
+    }
+
     const { productId, quantity = 1 } = req.body;
 
     if (!productId) {
@@ -94,7 +102,12 @@ export const addToCart = async (req, res, next) => {
 
 export const updateCartQuantity = async (req, res, next) => {
   try {
-    const userId = getEffectiveUserId(req);
+    const userId = await resolveEffectiveUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId or guestId is required' });
+    }
+
     const { id } = req.params;
     const { quantity } = req.body;
 
@@ -135,7 +148,12 @@ export const updateCartQuantity = async (req, res, next) => {
 
 export const removeCartItem = async (req, res, next) => {
   try {
-    const userId = getEffectiveUserId(req);
+    const userId = await resolveEffectiveUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId or guestId is required' });
+    }
+
     const { id } = req.params;
 
     const deleteResult = await pool.query('DELETE FROM cart_items WHERE id = $1 AND user_id = $2 RETURNING id', [id, userId]);

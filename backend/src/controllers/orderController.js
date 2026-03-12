@@ -1,13 +1,17 @@
 import { pool } from '../models/db.js';
 import { sendOrderPlacedEmail } from '../services/emailService.js';
-
-const getEffectiveUserId = (req) => Number(req.body.userId || req.query.userId || process.env.DEFAULT_USER_ID || 1);
+import { resolveEffectiveUserId } from '../utils/identity.js';
 
 export const createOrder = async (req, res, next) => {
   const client = await pool.connect();
 
   try {
-    const userId = getEffectiveUserId(req);
+    const userId = await resolveEffectiveUserId(req, client);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId or guestId is required' });
+    }
+
     const { shippingAddress } = req.body;
     let user = null;
 
@@ -119,7 +123,11 @@ export const createOrder = async (req, res, next) => {
 
 export const getOrders = async (req, res, next) => {
   try {
-    const userId = Number(req.query.userId || process.env.DEFAULT_USER_ID || 1);
+    const userId = await resolveEffectiveUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId or guestId is required' });
+    }
 
     const ordersResult = await pool.query(
       `

@@ -35,16 +35,46 @@ const setCachedValue = (key, value) => {
 };
 
 const parseResponse = (response) => response.data;
+const AUTH_USER_KEY = 'flipkartCloneAuthUser';
+const GUEST_ID_KEY = 'flipkartCloneGuestId';
+
+const generateGuestId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID().replace(/-/g, '');
+  }
+
+  return `guest_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+};
+
 const getStoredUser = () => {
   if (typeof window === 'undefined') return null;
   try {
-    return JSON.parse(localStorage.getItem('flipkartCloneAuthUser') || 'null');
+    return JSON.parse(localStorage.getItem(AUTH_USER_KEY) || 'null');
   } catch {
     return null;
   }
 };
 
-const getUserId = () => getStoredUser()?.id;
+const getOrCreateGuestId = () => {
+  if (typeof window === 'undefined') return null;
+
+  const existing = localStorage.getItem(GUEST_ID_KEY);
+  if (existing) return existing;
+
+  const generated = generateGuestId();
+  localStorage.setItem(GUEST_ID_KEY, generated);
+  return generated;
+};
+
+const getIdentityPayload = () => {
+  const userId = getStoredUser()?.id;
+  if (userId) {
+    return { userId };
+  }
+
+  const guestId = getOrCreateGuestId();
+  return guestId ? { guestId } : {};
+};
 
 export const getProducts = async (params = {}) => {
   const key = getCacheKey('/products', params);
@@ -69,52 +99,52 @@ export const getProductById = async (id) => {
 };
 
 export const getCart = async () => {
-  const userId = getUserId();
+  const identityPayload = getIdentityPayload();
   const response = await api.get('/cart', {
-    params: userId ? { userId } : {}
+    params: identityPayload
   });
   return parseResponse(response);
 };
 
 export const addToCart = async (payload) => {
-  const userId = getUserId();
+  const identityPayload = getIdentityPayload();
   const response = await api.post('/cart', {
     ...payload,
-    ...(userId ? { userId } : {})
+    ...identityPayload
   });
   return parseResponse(response);
 };
 
 export const updateCart = async (cartItemId, payload) => {
-  const userId = getUserId();
+  const identityPayload = getIdentityPayload();
   const response = await api.patch(`/cart/${cartItemId}`, {
     ...payload,
-    ...(userId ? { userId } : {})
+    ...identityPayload
   });
   return parseResponse(response);
 };
 
 export const removeFromCart = async (cartItemId) => {
-  const userId = getUserId();
+  const identityPayload = getIdentityPayload();
   const response = await api.delete(`/cart/${cartItemId}`, {
-    params: userId ? { userId } : {}
+    params: identityPayload
   });
   return parseResponse(response);
 };
 
 export const placeOrder = async (payload) => {
-  const userId = getUserId();
+  const identityPayload = getIdentityPayload();
   const response = await api.post('/orders', {
     ...payload,
-    ...(userId ? { userId } : {})
+    ...identityPayload
   });
   return parseResponse(response);
 };
 
 export const getOrderHistory = async () => {
-  const userId = getUserId();
+  const identityPayload = getIdentityPayload();
   const response = await api.get('/orders', {
-    params: userId ? { userId } : {}
+    params: identityPayload
   });
   return parseResponse(response);
 };
