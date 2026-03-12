@@ -30,6 +30,10 @@ import { pool } from './models/db.js';
 
 app.use(express.json());
 
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ success: true, message: 'pong' });
+});
+
 app.get('/api/health', async (req, res) => {
   try {
     // Ping the database to keep Serverless Postgres awake
