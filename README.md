@@ -2,10 +2,7 @@
 
 A full-stack, production-style e-commerce app inspired by Flipkart. Built as an SDE Intern assignment, this project demonstrates scalable architecture, modern UI, and robust backend APIs.
 
-## 🚀 Live Demo
-
-- [Frontend](https://frontend-three-sage-48.vercel.app/)
-- [Backend Health](https://backend-eight-eta-92.vercel.app/api/health)
+## 🚀 Live Demo (https://frontend-three-sage-48.vercel.app/)
 
 ## 📦 Features
 
