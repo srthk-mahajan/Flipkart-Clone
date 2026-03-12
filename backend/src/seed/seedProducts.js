@@ -3,6 +3,22 @@ import { initDatabase, pool } from '../models/db.js';
 
 dotenv.config();
 
+const slugify = (value = '') =>
+  String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const buildImageGallery = (product) => {
+  const slug = slugify(product.name || 'product');
+
+  return [
+    product.image_url,
+    `https://picsum.photos/seed/${slug}-gallery-1/1200/900`,
+    `https://picsum.photos/seed/${slug}-gallery-2/1200/900`
+  ];
+};
+
 const products = [
   // electronics
   {
@@ -488,12 +504,14 @@ const seed = async () => {
     await client.query('DELETE FROM products');
 
     for (const product of products) {
+      const imageUrls = buildImageGallery(product);
+
       await client.query(
         `
-        INSERT INTO products (name, description, price, category, stock, image_url)
-        VALUES ($1, $2, $3, $4, $5, $6);
+        INSERT INTO products (name, description, price, category, stock, image_url, image_urls)
+        VALUES ($1, $2, $3, $4, $5, $6, $7);
         `,
-        [product.name, product.description, product.price, product.category, product.stock, product.image_url]
+        [product.name, product.description, product.price, product.category, product.stock, product.image_url, imageUrls]
       );
     }
 

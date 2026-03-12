@@ -20,7 +20,7 @@ export const getProducts = async (req, res, next) => {
     const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
 
     const query = `
-      SELECT id, name, description, price, category, stock, image_url
+      SELECT id, name, description, price, category, stock, image_url, image_urls
       FROM products
       ${whereClause}
       ORDER BY id ASC;
@@ -44,7 +44,7 @@ export const getProductById = async (req, res, next) => {
 
     const { rows } = await pool.query(
       `
-      SELECT id, name, description, price, category, stock, image_url
+      SELECT id, name, description, price, category, stock, image_url, image_urls
       FROM products
       WHERE id = $1;
       `,

@@ -31,11 +31,9 @@ function ProductDetail() {
   if (loading) return <div className="panel">Loading product details...</div>;
   if (!product) return <div className="panel">Product not found</div>;
 
-  const carouselImages = [
-    product.image_url,
-    `${product.image_url}&v=2`,
-    `${product.image_url}&v=3`
-  ];
+  const carouselImages = product.image_urls?.length
+    ? product.image_urls
+    : [product.image_url];
   const oldPrice = Math.round(Number(product.price) * 1.22);
   const discount = Math.max(5, Math.round(((oldPrice - Number(product.price)) / oldPrice) * 100));
 

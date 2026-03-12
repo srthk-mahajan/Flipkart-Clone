@@ -43,8 +43,14 @@ export const initDatabase = async () => {
         price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
         category VARCHAR(80) NOT NULL,
         stock INT NOT NULL CHECK (stock >= 0),
-        image_url TEXT NOT NULL
+        image_url TEXT NOT NULL,
+        image_urls TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]
       );
+    `);
+
+    await client.query(`
+      ALTER TABLE products
+      ADD COLUMN IF NOT EXISTS image_urls TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
     `);
 
     await client.query(`
