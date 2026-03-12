@@ -9,6 +9,7 @@ function Home() {
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [heroStartIndex, setHeroStartIndex] = useState(0);
+  const [offerTimeLeft, setOfferTimeLeft] = useState(0);
   const { addItem } = useCart();
   const { wishlistIds } = useWishlist();
 
@@ -96,6 +97,25 @@ function Home() {
 
     return () => clearInterval(interval);
   }, [topHeroCards.length]);
+
+  useEffect(() => {
+    const offerEnd = Date.now() + 6 * 60 * 60 * 1000;
+    const tick = () => {
+      const leftSeconds = Math.max(0, Math.floor((offerEnd - Date.now()) / 1000));
+      setOfferTimeLeft(leftSeconds);
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const offerClock = useMemo(() => {
+    const hours = String(Math.floor(offerTimeLeft / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((offerTimeLeft % 3600) / 60)).padStart(2, '0');
+    const seconds = String(offerTimeLeft % 60).padStart(2, '0');
+    return { hours, minutes, seconds };
+  }, [offerTimeLeft]);
 
   const visibleHeroCards = useMemo(() => {
     const visibleCount = Math.min(3, topHeroCards.length);
@@ -212,6 +232,13 @@ function Home() {
             />
           ))}
         </div>
+
+        <section className="bank-offer-strip">
+          <strong>Bank offer ends in</strong>
+          <span>{offerClock.hours}</span> Hrs
+          <span>{offerClock.minutes}</span> Min
+          <span>{offerClock.seconds}</span> Sec
+        </section>
 
         <section className="subcat-strip">
           {electronicsQuickItems.map((item) => (

@@ -404,6 +404,28 @@ a {
   width: 18px;
 }
 
+.bank-offer-strip {
+  margin: 4px 0 10px;
+  background: #dbe7f8;
+  border: 1px solid #cbd9ef;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.bank-offer-strip span {
+  background: #2a55e5;
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 7px;
+  min-width: 30px;
+  text-align: center;
+}
+
 .subcat-strip {
   margin: 10px 0 8px;
   background: #fff;
@@ -893,6 +915,12 @@ a {
   gap: 8px;
 }
 
+.price-head-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .final-price {
   font-size: 22px;
   font-weight: 700;
@@ -914,6 +942,23 @@ a {
   margin: 0;
   color: #2a55e5;
   font-size: 13px;
+}
+
+.delivery-hint {
+  margin: 0;
+  color: #388e3c;
+  font-size: 13px;
+}
+
+.assured-badge {
+  background: #f5f8ff;
+  color: #2a55e5;
+  border: 1px solid #c8d7ff;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  white-space: nowrap;
 }
 
 .wishlist-icon-btn {
@@ -1129,6 +1174,42 @@ a {
   font-size: 28px;
   font-weight: 700;
   margin: 6px 0;
+}
+
+.detail-price-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-mrp {
+  margin: -4px 0 6px;
+  color: #878787;
+}
+
+.detail-mrp span {
+  color: #388e3c;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.offer-panel {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fcfcfc;
+}
+
+.offer-panel h4 {
+  margin: 0 0 6px;
+}
+
+.offer-panel ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
 }
 
 .stock.in {

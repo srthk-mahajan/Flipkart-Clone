@@ -1,4 +1,5 @@
 import { pool } from '../models/db.js';
+import { sendOrderPlacedEmail } from '../services/emailService.js';
 
 const getEffectiveUserId = (req) => Number(req.body.userId || req.query.userId || process.env.DEFAULT_USER_ID || 1);
 
@@ -8,12 +9,23 @@ export const createOrder = async (req, res, next) => {
   try {
     const userId = getEffectiveUserId(req);
     const { shippingAddress } = req.body;
+    let user = null;
 
     if (!shippingAddress) {
       return res.status(400).json({ success: false, message: 'shippingAddress is required' });
     }
 
     await client.query('BEGIN');
+
+    const userResult = await client.query(
+      `
+      SELECT id, name, email
+      FROM users
+      WHERE id = $1;
+      `,
+      [userId]
+    );
+    user = userResult.rows[0] || null;
 
     const cartResult = await client.query(
       `
@@ -78,13 +90,24 @@ export const createOrder = async (req, res, next) => {
 
     await client.query('COMMIT');
 
+    const orderPayload = {
+      ...order,
+      items: cartItems
+    };
+
+    const recipientEmail = process.env.ORDER_TO_EMAIL || user?.email;
+    void sendOrderPlacedEmail({
+      recipientEmail,
+      recipientName: user?.name || 'Customer',
+      order: orderPayload
+    }).catch((emailError) => {
+      console.error('Order email notification failed:', emailError?.message || emailError);
+    });
+
     res.status(201).json({
       success: true,
       message: 'Order placed successfully',
-      data: {
-        ...order,
-        items: cartItems
-      }
+      data: orderPayload
     });
   } catch (error) {
     await client.query('ROLLBACK');

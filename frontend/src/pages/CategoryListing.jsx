@@ -460,11 +460,15 @@ function CategoryListing() {
                 </div>
 
                 <div className="listing-price">
-                  <p className="final-price">₹{Number(product.price).toLocaleString('en-IN')}</p>
+                  <div className="price-head-row">
+                    <p className="final-price">₹{Number(product.price).toLocaleString('en-IN')}</p>
+                    <span className="assured-badge">Assured</span>
+                  </div>
                   <p className="mrp">
                     ₹{Number(oldPrice).toLocaleString('en-IN')} <span>{discount}% off</span>
                   </p>
                   <p className="bank-offer">Bank Offer available</p>
+                  <p className="delivery-hint">Free delivery by Tomorrow</p>
 
                   <button className="wishlist-icon-btn" onClick={() => toggleWishlist(product.id)}>
                     <FiHeart className={isWishlisted(product.id) ? 'filled' : ''} />

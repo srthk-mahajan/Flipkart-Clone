@@ -36,6 +36,8 @@ function ProductDetail() {
     `${product.image_url}&v=2`,
     `${product.image_url}&v=3`
   ];
+  const oldPrice = Math.round(Number(product.price) * 1.22);
+  const discount = Math.max(5, Math.round(((oldPrice - Number(product.price)) / oldPrice) * 100));
 
   const onBuyNow = async () => {
     await addItem(product.id, 1);
@@ -58,11 +60,26 @@ function ProductDetail() {
       <div className="right panel">
         <h1>{product.name}</h1>
         <p className="muted">Category: {product.category}</p>
-        <p className="detail-price">₹{Number(product.price).toLocaleString('en-IN')}</p>
+        <div className="detail-price-wrap">
+          <p className="detail-price">₹{Number(product.price).toLocaleString('en-IN')}</p>
+          <span className="assured-badge">Assured</span>
+        </div>
+        <p className="detail-mrp">
+          ₹{Number(oldPrice).toLocaleString('en-IN')} <span>{discount}% off</span>
+        </p>
         <p className={product.stock > 0 ? 'stock in' : 'stock out'}>
           {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
         </p>
         <p>{product.description}</p>
+
+        <div className="offer-panel">
+          <h4>Available offers</h4>
+          <ul>
+            <li>Bank Offer: 10% instant discount on select cards</li>
+            <li>Special Price: Extra ₹500 off on prepaid orders</li>
+            <li>No Cost EMI options available</li>
+          </ul>
+        </div>
 
         <div className="spec-table-wrap">
           <h3>Specifications</h3>
