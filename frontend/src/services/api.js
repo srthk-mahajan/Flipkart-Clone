@@ -6,6 +6,7 @@ const api = axios.create({
 
 const PRODUCT_CACHE_TTL_MS = 60 * 1000;
 const productCache = new Map();
+const PRODUCT_STORAGE_PREFIX = 'flipkartCloneProductsCache:';
 
 const getCacheKey = (endpoint, params = {}) => {
   const entries = Object.entries(params)
@@ -32,6 +33,41 @@ const setCachedValue = (key, value) => {
     value,
     expiresAt: Date.now() + PRODUCT_CACHE_TTL_MS
   });
+};
+
+const getPersistentCacheValue = (key) => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = localStorage.getItem(`${PRODUCT_STORAGE_PREFIX}${key}`);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed?.expiresAt || Date.now() > parsed.expiresAt) {
+      localStorage.removeItem(`${PRODUCT_STORAGE_PREFIX}${key}`);
+      return null;
+    }
+
+    return parsed.value || null;
+  } catch {
+    return null;
+  }
+};
+
+const setPersistentCacheValue = (key, value) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(
+      `${PRODUCT_STORAGE_PREFIX}${key}`,
+      JSON.stringify({
+        value,
+        expiresAt: Date.now() + PRODUCT_CACHE_TTL_MS
+      })
+    );
+  } catch {
+    // Ignore storage quota/storage access errors.
+  }
 };
 
 const parseResponse = (response) => response.data;
@@ -81,9 +117,16 @@ export const getProducts = async (params = {}) => {
   const cached = getCachedValue(key);
   if (cached) return cached;
 
+  const persistentCached = getPersistentCacheValue(key);
+  if (persistentCached) {
+    setCachedValue(key, persistentCached);
+    return persistentCached;
+  }
+
   const response = await api.get('/products', { params });
   const parsed = parseResponse(response);
   setCachedValue(key, parsed);
+  setPersistentCacheValue(key, parsed);
   return parsed;
 };
 
@@ -92,9 +135,16 @@ export const getProductById = async (id) => {
   const cached = getCachedValue(key);
   if (cached) return cached;
 
+  const persistentCached = getPersistentCacheValue(key);
+  if (persistentCached) {
+    setCachedValue(key, persistentCached);
+    return persistentCached;
+  }
+
   const response = await api.get(`/products/${id}`);
   const parsed = parseResponse(response);
   setCachedValue(key, parsed);
+  setPersistentCacheValue(key, parsed);
   return parsed;
 };
 
